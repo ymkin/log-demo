@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--配置集中管理的属性
+        我们可以直接获取该属性的value值
+        格式: ${name}  可以直接获取name属性的value值 ，跟spring的spel类似
+
+        指定日期的格式：
+            %-5level  输出日志基本， 5代表的宽度  -5 代表从左边，左对齐5个字符
+             %d{yyyy-MM-dd HH:mm:ss.SSS}日期
+             %c类的完整名称
+             %M为method
+             %L为行号
+             %thread线程名称
+             %m或者%msg为信息
+             %n换行
+    -->
+    <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度 %msg：日志消息， %n是换行符-->
+    <property name="pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %c [%thread] %-5level %msg%n" />
+    <!--定义文件输出的路径-->
+    <property name="dir" value="D:/D/logs/"/>
+    <!--控制台日志输出的appender对象-->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <!--输出流对象 默认是system.out   system.error-->
+        <target>System.err</target>
+        <!--日志格式配置-->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!--定义日志输出的Appender对象-->
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <!--日志保存的路径-->
+        <file>${dir}/logback.log</file>
+        <!--日志消息格式-->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!--定义日志输出的Appender对象-->
+    <appender name="htmlFile" class="ch.qos.logback.core.FileAppender">
+        <!--日志保存的路径-->
+        <file>${dir}/logback.html</file>
+        <!--日志消息格式-->
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ch.qos.logback.classic.html.HTMLLayout">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}%c%thread%-5level%msg</pattern>
+            </layout>
+        </encoder>
+    </appender>
+    <!--日志拆分和归档压缩的appender对象-->
+    <appender name="rollFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--日志保存的路径-->
+        <file>${dir}/roll_logback.log</file>
+        <!--日志消息格式-->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${pattern}</pattern>
+        </encoder>
+        <!--指定拆分的规则-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--按照时间和压缩格式声明拆分的文件名      按照秒进行拆分  %i拆分的序号   gz进行压缩-->
+            <fileNamePattern>${dir}/rolling.%d{yyyy-MM-dd}.log%i.gz</fileNamePattern>
+            <!--触发的前提    只要文件大小到达了1MB就会进行压缩，然后创建新的文件-->
+            <maxFileSize>1MB</maxFileSize>
+        </rollingPolicy>
+        <!--日志级别过滤器    按照日志的级别进行过滤-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!--日志过滤规则     level 设置过滤的级别， 只有当前级别或者比当前级别更高的才能过滤出来-->
+            <level>ERROR</level>
+            <!--如果是相同的或者比设置的级别更高的进行放行-->
+            <onMatch>ACCEPT</onMatch>
+            <!--如果比当前级别更低的进行拦截下来-->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!--异步日志-->
+    <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+        <!--引用其中已经存在的Appender进行异步的控制-->
+        <appender-ref ref="rollFile" />
+    </appender>
+    <!--root logger配置-->
+    <root level="ALL">
+        <appender-ref ref="console"/>
+        <appender-ref ref="async"/>
+    </root>
+
+    <!--自定义Logger对象
+    additivity= false 自定义logger对象是否继承rootLogger
+    name 指定哪一个文件下的Logger是我们自定义的Logger 以及按照我们的设置的级别进行输出
+    -->
+    <logger name="com.zm.logback.LogBackDemo" level="info" additivity="false">
+        <appender-ref ref="console"/>
+    </logger>
+</configuration>

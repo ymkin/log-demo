@@ -1,0 +1,10 @@
+#logging:
+#  level:
+#    com.zm: debug # 自定义日志对象的记级别
+#  pattern:
+#    console: '%d{yyyy-MM-dd} [%thread] [%-5level] %logger{50} - %msg%n' # 控制台输出 ConsoleAppender
+#    file: '%d{yyyy-MM-dd} [%thread] %-5level %logger{50} - %msg%n'  # 输出到文件中的格式
+#  file: D:/D/logs/springboot.log
+#spring:
+#  profiles:
+#    active: pro
